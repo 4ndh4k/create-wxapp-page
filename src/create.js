@@ -15,6 +15,7 @@ const defaultValue = {
 	dir: cwd,
 	json: false,
 	style: 'wxss',
+	language: 'js',
 	type: 'page',
 };
 
@@ -77,7 +78,7 @@ const create = (options) => {
 
 	options = Object.assign({}, defaultValue, options);
 
-	const { dir, name, indent, json, style, type } = options;
+	const { dir, name, indent, json, style, type, language } = options;
 	const rootDir = getRootDir(dir);
 
 	validateAppJson(rootDir);
@@ -90,7 +91,7 @@ const create = (options) => {
 		mkdirp.sync(fileRoot);
 	}
 
-	const filesTypes = ['wxml', 'js', style];
+	const filesTypes = ['wxml', language, style];
 	if (json || type === 'component') {
 		filesTypes.push('json');
 	}
@@ -104,7 +105,7 @@ const create = (options) => {
 			throw new Error(`${filePath} 已存在！`);
 		}
 
-		const notStyleFiles = ['js', 'wxml', 'json'];
+		const notStyleFiles = [language, 'wxml', 'json'];
 		const templateExt = notStyleFiles.includes(fileType) ? fileType : 'wxss';
 		const templatePath = type === 'page' ? pageTemplatePath : componentTemplatePath;
 		const templateFile = fs.readFileSync(`${templatePath}/template.${templateExt}`, 'utf8');
@@ -197,6 +198,17 @@ const createPromptItems = (options) => ([
 		when: !options.style,
 	},
 	{
+		type: 'list',
+		message: 'language to use',
+		default: defaultValue.language,
+		choices: [
+			'js',
+			'ts',
+		],
+		name: 'language',
+		when: !options.language,
+	},
+	{
 		message: '请输入自定义样式文件的类型',
 		type: 'input',
 		default: defaultValue.style,
@@ -236,6 +248,11 @@ export const createBuilder = (yargs) => {
 			s: {
 				alias: 'style',
 				desc: '样式文件的类型 (如 wcss, scss 等)',
+				type: 'string',
+			},
+			l: {
+				alias: 'language',
+				desc: 'which language to use (default js)',
 				type: 'string',
 			},
 			y: {

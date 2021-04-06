@@ -9,6 +9,8 @@ Component({
 	observers: {},
 	pageLifetimes: {},
 	lifetimes:{},
-	methods: {}
+	methods: {
+	}
+
 });
 
